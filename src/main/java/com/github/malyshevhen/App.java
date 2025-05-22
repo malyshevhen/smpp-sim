@@ -28,13 +28,16 @@ public class App {
         log.info("Waiting for SMPP simulator to exit...");
         App.class.wait();
       } catch (InterruptedException e) {
+        log.info("Interrupted. Stopping SMPP simulator...");
+
         try {
           smppSim.stop();
         } catch (IOException ioEx) {
           log.error("Error stopping SMPP simulator.", ioEx);
           ioEx.printStackTrace();
         }
-        log.error("Error waiting for SMPP simulator to exit.", e);
+
+        log.info("SMPP simulator stopped.");
       }
     }
   }

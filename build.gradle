@@ -1,0 +1,47 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'io.freefair.lombok' version '8.13.1'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    api libs.org.opensmpp.opensmpp.sim
+    api libs.org.opensmpp.opensmpp.client
+    api libs.org.slf4j.slf4j.api
+    api libs.org.slf4j.slf4j.simple
+    testImplementation libs.junit.junit
+}
+
+group = 'com.github.malyshevhen'
+version = '1.0-SNAPSHOT'
+description = 'smpp-sim'
+java.sourceCompatibility = JavaVersion.VERSION_21
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
+
+// Run task
+task run(type: JavaExec) {
+    mainClass = 'com.github.malyshevhen.App'
+    classpath = sourceSets.main.runtimeClasspath
+}
