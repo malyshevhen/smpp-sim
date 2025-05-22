@@ -1,0 +1,54 @@
+# Maven
+target/
+!target/*.jar
+dependency-reduced-pom.xml
+.mvn/
+
+# Git
+.git/
+.gitignore
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+.factorypath
+
+# Logs
+logs/
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+LICENSE
+docs/
+
+# Build artifacts
+.gradle/
+build/
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Package files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# CSpell
+cspell.json
