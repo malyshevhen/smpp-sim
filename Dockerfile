@@ -1,17 +1,13 @@
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM gradle:8.14.0-jdk21 AS build
 WORKDIR /app
 
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-COPY src ./src
-
-RUN mvn package -DskipTests
+COPY build.gradle settings.gradle ./
+RUN gradle --no-daemon --no-parallel --console=plain build
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar /app/app.jar
+COPY --from=build /app/build/*.jar /app/app.jar
 COPY --from=build /app/src/main/resources/ /app/resources/
 
 ENV JAVA_OPTS=""

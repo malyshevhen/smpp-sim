@@ -44,4 +44,7 @@ tasks.withType(Javadoc) {
 task run(type: JavaExec) {
     mainClass = 'com.github.malyshevhen.App'
     classpath = sourceSets.main.runtimeClasspath
+
+    // pass args to application
+    args '2755', "$projectDir/src/main/resources/users.txt"
 }
