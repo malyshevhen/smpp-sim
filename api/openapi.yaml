@@ -1,0 +1,104 @@
+openapi: 3.1.0
+
+info:
+  title: SMPP Simulator REST API
+  version: 1.0.0
+  description: |
+    REST API for introspection of SMPP requests and messages handled by the simulator.
+    Provides endpoints for retrieving bind requests and submitted messages.
+servers:
+  - url: http://localhost:7070
+    description: Local development server
+paths:
+  /api/v1/requests/single_sm:
+    get:
+      summary: Get all single SubmitSM requests
+      description: Returns a list of all single SubmitSM (short message) requests received by the simulator.
+      responses:
+        "200":
+          description: List of SubmitSM requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubmitSM"
+  /api/v1/requests/multi_sm:
+    get:
+      summary: Get all multi SubmitMultiSM requests
+      description: Returns a list of all SubmitMultiSM requests received by the simulator.
+      responses:
+        "200":
+          description: List of SubmitMultiSM requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubmitMultiSM"
+  /api/v1/requests/bind:
+    get:
+      summary: Get all bind requests
+      description: Returns a list of all SMPP bind requests received by the simulator.
+      responses:
+        "200":
+          description: List of bind requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BindRequest"
+components:
+  schemas:
+    SubmitSM:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        message:
+          type: string
+        name:
+          type: string
+        sourceAddress:
+          type: string
+        destinationAddress:
+          type: string
+      required: [id, message, name, sourceAddress, destinationAddress]
+    SubmitMultiSM:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        message:
+          type: string
+        name:
+          type: string
+        sourceAddress:
+          type: string
+        destinationAddresses:
+          type: array
+          items:
+            type: string
+      required: [id, message, name, sourceAddress, destinationAddresses]
+    BindRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        systemId:
+          type: string
+        password:
+          type: string
+        cp:
+          type: string
+        name:
+          type: string
+        ton:
+          type: integer
+        npi:
+          type: integer
+      required: [id, systemId, password, cp, name, ton, npi]

@@ -98,6 +98,46 @@ The simulator handles SIGTERM and Ctrl+C gracefully, ensuring all sessions are c
 - `src/main/resources/users.cfg` - Example users file
 - `src/test/java/com/github/malyshevhen/SmppSimTest.java` - Integration tests
 
+## REST API for SMPP Introspection
+
+The simulator exposes a REST API for inspecting received SMPP requests and messages. This API is useful for integration testing, monitoring, and debugging.
+
+### OpenAPI Specification
+
+The OpenAPI (Swagger) spec for the REST API is available at:
+
+```yaml
+api/openapi.yaml
+```
+
+You can use this file with tools like [Swagger UI](https://swagger.io/tools/swagger-ui/) or [Redoc](https://redocly.com/) to explore and test the API interactively.
+
+### API Endpoints
+
+- `GET /api/v1/requests/single_sm` — List all single SubmitSM (short message) requests received by the simulator.
+- `GET /api/v1/requests/multi_sm` — List all SubmitMultiSM requests received by the simulator.
+- `GET /api/v1/requests/bind` — List all SMPP bind requests received by the simulator.
+
+All endpoints return JSON arrays of objects matching the schema in the OpenAPI spec.
+
+#### Example Usage
+
+Fetch all single SubmitSM requests:
+
+```sh
+curl http://localhost:8080/api/v1/requests/single_sm
+```
+
+Fetch all bind requests:
+
+```sh
+curl http://localhost:8080/api/v1/requests/bind
+```
+
+#### API Server
+
+The REST API server is started automatically with the simulator and listens on port `8080` by default. You can change the port in the source code if needed.
+
 ## License
 
 MIT or Apache 2.0

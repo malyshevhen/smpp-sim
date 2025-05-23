@@ -2,6 +2,7 @@ package com.github.malyshevhen;
 
 import com.github.malyshevhen.api.Server;
 import com.github.malyshevhen.proxy.PDUHandler;
+import com.github.malyshevhen.proxy.PDUHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -15,7 +16,7 @@ public class App {
     int smppPort = args.length > 1 ? Integer.parseInt(args[1]) : SMPP_SERVER_PORT;
     String usersFileName = args.length > 2 ? args[2] : null;
 
-    PDUHandler pduHandler = new PDUHandler();
+    PDUHandler pduHandler = new PDUHandlerImpl();
 
     log.info("Starting SMPP simulator with port {} and users file {}", smppPort, usersFileName);
     SmppSim simulator = new SmppSim(pduHandler, smppPort, usersFileName);

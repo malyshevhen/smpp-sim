@@ -1,7 +1,8 @@
 package com.github.malyshevhen.api;
 
-import com.github.malyshevhen.proxy.PDUHandler;
 import java.util.List;
+
+import com.github.malyshevhen.proxy.PDUHandler;
 
 public class Controller {
 
