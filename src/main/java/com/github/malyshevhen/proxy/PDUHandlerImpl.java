@@ -2,6 +2,7 @@ package com.github.malyshevhen.proxy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.smpp.pdu.BindTransmitterResp;
 import org.smpp.pdu.PDU;
@@ -10,27 +11,27 @@ import org.smpp.pdu.SubmitSMResp;
 
 @Slf4j
 public class PDUHandlerImpl implements PDUHandler {
-  private final List<BindTransmitterResp> bindTransmitterResponses = new ArrayList<>();
-  private final List<SubmitSMResp> submitSMResponses = new ArrayList<>();
-  private final List<SubmitMultiSMResp> submitMultiSMResponses = new ArrayList<>();
+  private final List<BindTransmitterResp> bindTransmitterResponses = new CopyOnWriteArrayList<>();
+  private final List<SubmitSMResp> submitSMResponses = new CopyOnWriteArrayList<>();
+  private final List<SubmitMultiSMResp> submitMultiSMResponses = new CopyOnWriteArrayList<>();
 
   @Override
-  public synchronized List<BindTransmitterResp> getBindResponses() {
+  public List<BindTransmitterResp> getBindResponses() {
     return new ArrayList<>(bindTransmitterResponses);
   }
 
   @Override
-  public synchronized List<SubmitSMResp> getSubmitSMResponses() {
+  public List<SubmitSMResp> getSubmitSMResponses() {
     return new ArrayList<>(submitSMResponses);
   }
 
   @Override
-  public synchronized List<SubmitMultiSMResp> getSubmitMultiSMResponses() {
+  public List<SubmitMultiSMResp> getSubmitMultiSMResponses() {
     return new ArrayList<>(submitMultiSMResponses);
   }
 
   @Override
-  public synchronized void handleClientRequest(PDU pdu) {
+  public void handleClientRequest(PDU pdu) {
     logPDU(pdu);
 
     switch (pdu) {

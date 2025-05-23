@@ -1,7 +1,6 @@
 package com.github.malyshevhen.api;
 
 import com.github.malyshevhen.proxy.PDUHandler;
-
 import io.javalin.Javalin;
 
 public class Server {

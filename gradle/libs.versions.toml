@@ -13,4 +13,4 @@ org-opensmpp-opensmpp-client = { module = "org.opensmpp:opensmpp-client", versio
 org-opensmpp-opensmpp-sim = { module = "org.opensmpp:opensmpp-sim", version.ref = "org-opensmpp-opensmpp-sim" }
 org-slf4j-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j-slf4j-api" }
 org-slf4j-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "org-slf4j-slf4j-simple" }
-io-javalin-javalin = { module = "io.javalin:javalin", version.ref = "io-javalin-javalin" }
+io-javalin-javalin = { module = "io.javalin:javalin-bundle", version.ref = "io-javalin-javalin" }
