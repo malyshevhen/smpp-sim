@@ -66,30 +66,40 @@ public class SmppSim {
     log.info("SMPP simulator stopped.");
   }
 
+  /**
+   * Loads the users table from the given file name or from the classpath if not provided.
+   *
+   * @param usersFileName the file path or null/empty to load from classpath
+   * @return Table of users
+   */
   private static Table getUsers(String usersFileName) {
     try {
-      if (usersFileName == null || usersFileName.isEmpty()) {
-        try (InputStream input =
-            App.class.getClassLoader().getResourceAsStream(DEFAULT_USERS_FILE)) {
-          if (input == null) {
-            log.error("Users file not found: {}", DEFAULT_USERS_FILE);
-            throw new RuntimeException("Users file not found: " + DEFAULT_USERS_FILE);
-          }
-
-          log.info("Reading users file from classpath: {}", DEFAULT_USERS_FILE);
-          Table table = new Table();
-          table.read(input);
-          return table;
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+      if (usersFileName != null && !usersFileName.isBlank()) {
+        return loadUsersFromFile(usersFileName);
       }
-
-      log.info("Reading users file from file system: {}", usersFileName);
-      return new Table(usersFileName);
+      return loadUsersFromClasspath();
     } catch (IOException e) {
       log.error("Error reading users file: {}", usersFileName, e);
-      throw new RuntimeException(e);
+      throw new RuntimeException("Failed to load users file: " + usersFileName, e);
+    }
+  }
+
+  private static Table loadUsersFromFile(String fileName) throws IOException {
+    log.info("Reading users file from file system: {}", fileName);
+    return new Table(fileName);
+  }
+
+  private static Table loadUsersFromClasspath() throws IOException {
+    try (InputStream input = App.class.getClassLoader().getResourceAsStream(DEFAULT_USERS_FILE)) {
+      if (input == null) {
+        log.error("Users file not found in classpath: {}", DEFAULT_USERS_FILE);
+        throw new RuntimeException("Users file not found: " + DEFAULT_USERS_FILE);
+      }
+
+      log.info("Reading users file from classpath: {}", DEFAULT_USERS_FILE);
+      Table table = new Table();
+      table.read(input);
+      return table;
     }
   }
 }
