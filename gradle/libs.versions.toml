@@ -8,6 +8,7 @@ org-opensmpp-opensmpp-sim = "3.0.2"
 org-projectlombok-lombok = "1.18.38"
 org-slf4j-slf4j-api = "2.0.7"
 org-slf4j-slf4j-simple = "2.0.7"
+org-jsmpp-jsmpp = "3.0.1"
 
 [libraries]
 junit-junit = { module = "junit:junit", version.ref = "junit-junit" }
@@ -16,3 +17,4 @@ org-opensmpp-opensmpp-sim = { module = "org.opensmpp:opensmpp-sim", version.ref 
 org-projectlombok-lombok = { module = "org.projectlombok:lombok", version.ref = "org-projectlombok-lombok" }
 org-slf4j-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j-slf4j-api" }
 org-slf4j-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "org-slf4j-slf4j-simple" }
+org-jsmpp-jsmpp = { module = "org.jsmpp:jsmpp", version.ref = "org-jsmpp-jsmpp" }
