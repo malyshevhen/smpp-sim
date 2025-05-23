@@ -2,8 +2,7 @@
 FROM gradle:8.14.0-jdk21 AS build
 WORKDIR /app
 
-COPY build.gradle settings.gradle ./
-COPY src/ ./src/
+COPY . .
 RUN gradle --no-daemon --no-parallel --console=plain clean build
 
 FROM eclipse-temurin:21-jre

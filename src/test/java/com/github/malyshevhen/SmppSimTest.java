@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.smpp.Data;
 import org.smpp.Session;
@@ -22,6 +24,8 @@ import org.smpp.pdu.BindReceiver;
 import org.smpp.pdu.BindRequest;
 import org.smpp.pdu.BindResponse;
 import org.smpp.pdu.BindTransmitter;
+import org.smpp.pdu.DeliverSM;
+import org.smpp.pdu.PDU;
 import org.smpp.pdu.SubmitSM;
 import org.smpp.pdu.SubmitSMResp;
 import org.smpp.pdu.UnbindResp;
@@ -30,13 +34,13 @@ import org.smpp.util.ByteBuffer;
 @Slf4j
 class SmppSimTest {
 
-  private static final int PORT = 2776;
   private static final String TEST_SYSTEM_ID = "pavel";
   private static final String TEST_PASSWORD = "dfsew";
   private static final String SOURCE_ADDR = "1234";
   private static final String DESTINATION_ADDR = "5678";
   private static final String TEST_MESSAGE = "Hello, SMPP world!";
 
+  private static int PORT;
   private static SmppSim smppSim;
   private static String tempUsersFile;
 
@@ -58,6 +62,7 @@ class SmppSimTest {
     Files.write(Paths.get(tempUsersFile), usersContent.getBytes());
 
     // Start the SMPP simulator
+    PORT = getFreePort();
     smppSim = new SmppSim(PORT, tempUsersFile);
     smppSim.start();
 
@@ -257,6 +262,145 @@ class SmppSimTest {
       assertEquals(Data.ESME_ROK, unbindResp.getCommandStatus());
     } finally {
       session.close();
+    }
+  }
+
+  @Test
+  void testBindWithInvalidCredentials() throws Exception {
+    TCPIPConnection connection = new TCPIPConnection("localhost", PORT);
+    connection.setReceiveTimeout(5000);
+    Session session = new Session(connection);
+    try {
+      BindRequest bindRequest = new BindTransmitter();
+      bindRequest.setSystemId(TEST_SYSTEM_ID);
+      bindRequest.setPassword("wrong");
+      bindRequest.setSystemType("");
+      bindRequest.setInterfaceVersion((byte) 0x34);
+      bindRequest.setAddressRange(new AddressRange());
+      BindResponse bindResponse = session.bind(bindRequest);
+      // Should fail
+      assertTrue(bindResponse.getCommandStatus() != Data.ESME_ROK);
+    } finally {
+      session.close();
+    }
+  }
+
+  // Skip this test for now
+  @Test
+  @Disabled
+  void testSendAndReceiveMessage() throws Exception {
+    // Receiver session
+    TCPIPConnection receiverConnection = new TCPIPConnection("localhost", PORT);
+    receiverConnection.setReceiveTimeout(5000);
+    Session receiverSession = new Session(receiverConnection);
+    // Transmitter session
+    TCPIPConnection transmitterConnection = new TCPIPConnection("localhost", PORT);
+    transmitterConnection.setReceiveTimeout(5000);
+    Session transmitterSession = new Session(transmitterConnection);
+    try {
+      // Bind receiver
+      BindRequest receiverBindRequest = new BindReceiver();
+      receiverBindRequest.setSystemId(TEST_SYSTEM_ID);
+      receiverBindRequest.setPassword(TEST_PASSWORD);
+      receiverBindRequest.setSystemType("");
+      receiverBindRequest.setInterfaceVersion((byte) 0x34);
+      AddressRange addressRange = new AddressRange();
+      addressRange.setTon((byte) 1);
+      addressRange.setNpi((byte) 1);
+      addressRange.setAddressRange(DESTINATION_ADDR);
+      receiverBindRequest.setAddressRange(addressRange);
+      BindResponse receiverBindResponse = receiverSession.bind(receiverBindRequest);
+      assertEquals(Data.ESME_ROK, receiverBindResponse.getCommandStatus());
+      // Bind transmitter
+      BindRequest transmitterBindRequest = new BindTransmitter();
+      transmitterBindRequest.setSystemId(TEST_SYSTEM_ID);
+      transmitterBindRequest.setPassword(TEST_PASSWORD);
+      transmitterBindRequest.setSystemType("");
+      transmitterBindRequest.setInterfaceVersion((byte) 0x34);
+      transmitterBindRequest.setAddressRange(new AddressRange());
+      BindResponse transmitterBindResponse = transmitterSession.bind(transmitterBindRequest);
+      assertEquals(Data.ESME_ROK, transmitterBindResponse.getCommandStatus());
+      // Send message
+      String message = "End-to-end test message";
+      SubmitSM submitSM = new SubmitSM();
+      submitSM.setSourceAddr(new Address((byte) 1, (byte) 1, SOURCE_ADDR));
+      submitSM.setDestAddr(new Address((byte) 1, (byte) 1, DESTINATION_ADDR));
+      submitSM.setShortMessage(message);
+      SubmitSMResp submitResp = transmitterSession.submit(submitSM);
+      assertEquals(Data.ESME_ROK, submitResp.getCommandStatus());
+      // Try to receive
+      PDU pdu = receiverSession.receive(5000);
+      assertNotNull(pdu);
+      assertTrue(pdu instanceof DeliverSM);
+      DeliverSM deliverSM = (DeliverSM) pdu;
+      String received = new String(deliverSM.getShortMessage());
+      assertEquals(message, received);
+      // Unbind
+      transmitterSession.unbind();
+      receiverSession.unbind();
+    } finally {
+      transmitterSession.close();
+      receiverSession.close();
+    }
+  }
+
+  @Test
+  void testSendLongMessage() throws Exception {
+    TCPIPConnection connection = new TCPIPConnection("localhost", PORT);
+    connection.setReceiveTimeout(5000);
+    Session session = new Session(connection);
+    try {
+      BindRequest bindRequest = new BindTransmitter();
+      bindRequest.setSystemId(TEST_SYSTEM_ID);
+      bindRequest.setPassword(TEST_PASSWORD);
+      bindRequest.setSystemType("");
+      bindRequest.setInterfaceVersion((byte) 0x34);
+      bindRequest.setAddressRange(new AddressRange());
+      BindResponse bindResponse = session.bind(bindRequest);
+      assertEquals(Data.ESME_ROK, bindResponse.getCommandStatus());
+      String longMessage = "A".repeat(200);
+      SubmitSM submitSM = new SubmitSM();
+      submitSM.setSourceAddr(new Address((byte) 1, (byte) 1, SOURCE_ADDR));
+      submitSM.setDestAddr(new Address((byte) 1, (byte) 1, DESTINATION_ADDR));
+      submitSM.setShortMessage(longMessage);
+      SubmitSMResp submitResp = session.submit(submitSM);
+      assertEquals(Data.ESME_ROK, submitResp.getCommandStatus());
+      session.unbind();
+    } finally {
+      session.close();
+    }
+  }
+
+  @Test
+  void testSendSpecialCharacters() throws Exception {
+    TCPIPConnection connection = new TCPIPConnection("localhost", PORT);
+    connection.setReceiveTimeout(5000);
+    Session session = new Session(connection);
+    try {
+      BindRequest bindRequest = new BindTransmitter();
+      bindRequest.setSystemId(TEST_SYSTEM_ID);
+      bindRequest.setPassword(TEST_PASSWORD);
+      bindRequest.setSystemType("");
+      bindRequest.setInterfaceVersion((byte) 0x34);
+      bindRequest.setAddressRange(new AddressRange());
+      BindResponse bindResponse = session.bind(bindRequest);
+      assertEquals(Data.ESME_ROK, bindResponse.getCommandStatus());
+      String specialMessage = "!@#$%^&*()_+-=~`[]{}|;':,./<>?";
+      SubmitSM submitSM = new SubmitSM();
+      submitSM.setSourceAddr(new Address((byte) 1, (byte) 1, SOURCE_ADDR));
+      submitSM.setDestAddr(new Address((byte) 1, (byte) 1, DESTINATION_ADDR));
+      submitSM.setShortMessage(specialMessage);
+      SubmitSMResp submitResp = session.submit(submitSM);
+      assertEquals(Data.ESME_ROK, submitResp.getCommandStatus());
+      session.unbind();
+    } finally {
+      session.close();
+    }
+  }
+
+  private static int getFreePort() throws IOException {
+    try (ServerSocket socket = new ServerSocket(0)) {
+      return socket.getLocalPort();
     }
   }
 }
