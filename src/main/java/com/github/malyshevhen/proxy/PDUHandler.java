@@ -9,9 +9,6 @@ import org.smpp.pdu.SubmitMultiSMResp;
 import org.smpp.pdu.SubmitSMResp;
 import org.smpp.pdu.UnbindResp;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 @Slf4j
 public class PDUHandler {
   private final List<BindTransmitterResp> bindTransmitterResponses = new ArrayList<>();
@@ -53,12 +50,5 @@ public class PDUHandler {
     log.info("PDU command ID: {}", pdu.getCommandId());
     log.info("PDU sequence number: {}", pdu.getSequenceNumber());
     log.info("PDU body: {}", pdu.debugString());
-
-    Gson gson = new GsonBuilder()
-        .setPrettyPrinting()
-        .serializeNulls()
-        .create();
-    String json = gson.toJson(pdu);
-    log.info("PDU JSON: {}", json);
   }
 }

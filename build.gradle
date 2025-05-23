@@ -19,7 +19,6 @@ dependencies {
     api libs.org.slf4j.slf4j.api
     api libs.org.slf4j.slf4j.simple
     api libs.io.javalin.javalin
-    api libs.com.google.code.gson
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.0'
@@ -67,12 +66,3 @@ tasks.withType(JavaCompile).configureEach {
 tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
 }
-
-// Run task
-// tasks.register('run', JavaExec) {
-//     mainClass = 'com.github.malyshevhen.App'
-//     classpath = sourceSets.main.runtimeClasspath
-
-//     // pass args to application
-//     args '2755', "$projectDir/src/main/resources/users.cfg"
-// }

@@ -37,37 +37,47 @@ public class SmppSim {
     this.deliveryInfoSender = new DeliveryInfoSender();
   }
 
-  protected void start() throws IOException {
-    log.info("Start SMPP simulator.");
+  protected void start() {
+    try {
+      log.info("Start SMPP simulator.");
 
-    deliveryInfoSender.start();
-    Table users = getUsers(usersFileName);
-    PDUProcessorFactory factory =
-        new PDUProcessorFactoryProxy(
-            new SimulatorPDUProcessorFactory(processors, messageStore, deliveryInfoSender, users),
-            pduHandler);
-    smscListener.setPDUProcessorFactory(factory);
-    smscListener.start();
+      deliveryInfoSender.start();
+      Table users = getUsers(usersFileName);
+      PDUProcessorFactory factory =
+          new PDUProcessorFactoryProxy(
+              new SimulatorPDUProcessorFactory(processors, messageStore, deliveryInfoSender, users),
+              pduHandler);
+      smscListener.setPDUProcessorFactory(factory);
+      smscListener.start();
+    } catch (IOException e) {
+      log.error("Error starting SMPP simulator.", e);
+      throw new RuntimeException("Failed to start SMPP simulator.", e);
+    }
 
     log.info("started.");
   }
 
-  protected void stop() throws IOException {
+  protected void stop() {
     log.info("Stopping listener...");
 
-    synchronized (processors) {
-      int procCount = processors.count();
-      SimulatorPDUProcessor proc;
-      SMSCSession session;
-      for (int i = 0; i < procCount; i++) {
-        proc = (SimulatorPDUProcessor) processors.get(i);
-        session = proc.getSession();
-        log.info("Stopping session {}: {} ...", i, proc.getSystemId());
-        session.stop();
-        log.info(" stopped.");
+    try {
+      synchronized (processors) {
+        int procCount = processors.count();
+        SimulatorPDUProcessor proc;
+        SMSCSession session;
+        for (int i = 0; i < procCount; i++) {
+          proc = (SimulatorPDUProcessor) processors.get(i);
+          session = proc.getSession();
+          log.info("Stopping session {}: {} ...", i, proc.getSystemId());
+          session.stop();
+          log.info(" stopped.");
+        }
       }
+
+      smscListener.stop();
+    } catch (IOException e) {
+      log.error("Error stopping SMPP simulator.", e);
     }
-    smscListener.stop();
 
     log.info("SMPP simulator stopped.");
   }
@@ -107,5 +117,9 @@ public class SmppSim {
       table.read(input);
       return table;
     }
+  }
+
+  public void addShutdownHook() {
+    Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
   }
 }
