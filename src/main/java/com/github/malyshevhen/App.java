@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 public class App {
   public static void main(String[] args) {
     int port = args.length > 0 ? Integer.parseInt(args[0]) : 2775;
-    String usersFileName = args.length > 1 ? args[1] : "users.txt";
+    String usersFileName = args.length > 1 ? args[1] : null;
 
     log.info("Starting SMPP simulator with port {} and users file {}", port, usersFileName);
     SmppSim smppSim = new SmppSim(port, usersFileName);

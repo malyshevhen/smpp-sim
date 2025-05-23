@@ -1,7 +1,9 @@
 plugins {
+    id 'application'
     id 'java-library'
     id 'maven-publish'
     id 'io.freefair.lombok' version '8.13.1'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 repositories {
@@ -26,6 +28,20 @@ group = 'com.github.malyshevhen'
 version = '1.0-SNAPSHOT'
 description = 'smpp-sim'
 java.sourceCompatibility = JavaVersion.VERSION_21
+
+application {
+    mainClass = 'com.github.malyshevhen.App'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Main-Class': application.mainClass
+        )
+    }
+}
 
 publishing {
     publications {
@@ -52,10 +68,10 @@ tasks.withType(Javadoc).configureEach {
 }
 
 // Run task
-tasks.register('run', JavaExec) {
-    mainClass = 'com.github.malyshevhen.App'
-    classpath = sourceSets.main.runtimeClasspath
+// tasks.register('run', JavaExec) {
+//     mainClass = 'com.github.malyshevhen.App'
+//     classpath = sourceSets.main.runtimeClasspath
 
-    // pass args to application
-    args '2755', "$projectDir/src/main/resources/users.cfg"
-}
+//     // pass args to application
+//     args '2755', "$projectDir/src/main/resources/users.cfg"
+// }

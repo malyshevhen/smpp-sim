@@ -1,6 +1,7 @@
 package com.github.malyshevhen;
 
 import java.io.IOException;
+import java.io.InputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.smpp.smscsim.DeliveryInfoSender;
 import org.smpp.smscsim.PDUProcessorGroup;
@@ -14,6 +15,8 @@ import org.smpp.smscsim.util.Table;
 
 @Slf4j
 public class SmppSim {
+
+  private static final String DEFAULT_USERS_FILE = "users.cfg";
 
   private final String usersFileName;
   private final SMSCListener smscListener;
@@ -33,7 +36,7 @@ public class SmppSim {
     log.info("Start SMPP simulator.");
 
     deliveryInfoSender.start();
-    Table users = new Table(usersFileName);
+    Table users = getUsers(usersFileName);
     SimulatorPDUProcessorFactory factory =
         new SimulatorPDUProcessorFactory(processors, messageStore, deliveryInfoSender, users);
     factory.setDisplayInfo(true);
@@ -61,5 +64,32 @@ public class SmppSim {
     smscListener.stop();
 
     log.info("SMPP simulator stopped.");
+  }
+
+  private static Table getUsers(String usersFileName) {
+    try {
+      if (usersFileName == null || usersFileName.isEmpty()) {
+        try (InputStream input =
+            App.class.getClassLoader().getResourceAsStream(DEFAULT_USERS_FILE)) {
+          if (input == null) {
+            log.error("Users file not found: {}", DEFAULT_USERS_FILE);
+            throw new RuntimeException("Users file not found: " + DEFAULT_USERS_FILE);
+          }
+
+          log.info("Reading users file from classpath: {}", DEFAULT_USERS_FILE);
+          Table table = new Table();
+          table.read(input);
+          return table;
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+
+      log.info("Reading users file from file system: {}", usersFileName);
+      return new Table(usersFileName);
+    } catch (IOException e) {
+      log.error("Error reading users file: {}", usersFileName, e);
+      throw new RuntimeException(e);
+    }
   }
 }
