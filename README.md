@@ -90,7 +90,7 @@ The simulator handles SIGTERM and Ctrl+C gracefully, ensuring all sessions are c
 - `src/test/java/com/github/malyshevhen/SmppSimTest.java` - Integration tests
 
 ## License
-MIT or Apache 2.0 (specify your actual license here)
+MIT or Apache 2.0
 
 ---
 
