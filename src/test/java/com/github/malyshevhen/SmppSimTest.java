@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.github.malyshevhen.proxy.PDUHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Files;
@@ -63,7 +64,8 @@ class SmppSimTest {
 
     // Start the SMPP simulator
     PORT = getFreePort();
-    smppSim = new SmppSim(PORT, tempUsersFile);
+    PDUHandler pduHeader = new PDUHandler();
+    smppSim = new SmppSim(pduHeader, PORT, tempUsersFile);
     smppSim.start();
 
     // Give it a moment to initialize

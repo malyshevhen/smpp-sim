@@ -1,10 +1,39 @@
 package com.github.malyshevhen.api;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import com.github.malyshevhen.proxy.PDUHandler;
+import java.util.List;
 
 public class Controller {
 
-  private static final ConcurrentMap<String, ShortMessageInfo> MESSAGES = new ConcurrentHashMap<>();
-  private static final ConcurrentMap<String, BindRequest> BIND_REQUESTS = new ConcurrentHashMap<>();
+  private final PDUHandler pduHandler;
+
+  public Controller(PDUHandler pduHandler) {
+    this.pduHandler = pduHandler;
+  }
+
+  public List<ShortMessageInfo> getSubmitSMs() {
+    return pduHandler.getSubmitSMs().stream()
+        .map(ShortMessageInfo::from)
+        .toList();
+  }
+
+  public List<MultiShortMessageInfo> getSubmitMultiSMs() {
+    return pduHandler.getSubmitMultiSMs().stream()
+        .map(MultiShortMessageInfo::from)
+        .toList();
+  }
+
+  public List<BindRequestInfo> getBindRequests() {
+    return pduHandler.getBindRequests().stream()
+        .map(BindRequestInfo::from)
+        .toList();
+  }
+
+  public Object getSubmitSMResponses() {
+    return List.of();
+  }
+
+  public Object getSubmitMultiSMResponses() {
+    return List.of();
+  }
 }

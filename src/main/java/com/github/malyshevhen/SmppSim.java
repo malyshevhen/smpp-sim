@@ -1,9 +1,13 @@
 package com.github.malyshevhen;
 
+import com.github.malyshevhen.api.Controller;
+import com.github.malyshevhen.proxy.PDUHandler;
+import com.github.malyshevhen.proxy.PDUProcessorFactoryProxy;
 import java.io.IOException;
 import java.io.InputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.smpp.smscsim.DeliveryInfoSender;
+import org.smpp.smscsim.PDUProcessorFactory;
 import org.smpp.smscsim.PDUProcessorGroup;
 import org.smpp.smscsim.SMSCListener;
 import org.smpp.smscsim.SMSCListenerImpl;
@@ -23,9 +27,11 @@ public class SmppSim {
   private final PDUProcessorGroup processors;
   private final ShortMessageStore messageStore;
   private final DeliveryInfoSender deliveryInfoSender;
+  private final PDUHandler pduHandler;
 
-  public SmppSim(int port, String usersFileName) {
+  public SmppSim(PDUHandler pduHandler, int port, String usersFileName) {
     this.usersFileName = usersFileName;
+    this.pduHandler = pduHandler;
     this.smscListener = new SMSCListenerImpl(port, true);
     this.processors = new PDUProcessorGroup();
     this.messageStore = new ShortMessageStore();
@@ -37,9 +43,10 @@ public class SmppSim {
 
     deliveryInfoSender.start();
     Table users = getUsers(usersFileName);
-    SimulatorPDUProcessorFactory factory =
-        new SimulatorPDUProcessorFactory(processors, messageStore, deliveryInfoSender, users);
-    factory.setDisplayInfo(true);
+    PDUProcessorFactory factory =
+        new PDUProcessorFactoryProxy(
+            new SimulatorPDUProcessorFactory(processors, messageStore, deliveryInfoSender, users),
+            pduHandler);
     smscListener.setPDUProcessorFactory(factory);
     smscListener.start();
 

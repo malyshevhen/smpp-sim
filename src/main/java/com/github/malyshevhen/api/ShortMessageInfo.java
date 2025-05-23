@@ -1,5 +1,7 @@
 package com.github.malyshevhen.api;
 
+import org.smpp.pdu.SubmitSM;
+
 /**
  * Represents a short message information. This class is used to store and validate the information
  * of a short message. It includes the message ID, message content, sender's name, source address,
@@ -23,5 +25,15 @@ public record ShortMessageInfo(
     if (destinationAddress == null || destinationAddress.isEmpty()) {
       throw new IllegalArgumentException("Destination address cannot be null or empty");
     }
+  }
+
+  public static ShortMessageInfo from(SubmitSM submitSM) {
+    Long id = Long.valueOf(submitSM.getSequenceNumber());
+    String message = submitSM.getShortMessage();
+    String name = submitSM.getSourceAddr().debugString(); // TODO: use real name
+    String sourceAddress = submitSM.getSourceAddr().getAddress();
+    String destinationAddress = submitSM.getDestAddr().getAddress();
+
+    return new ShortMessageInfo(id, message, name, sourceAddress, destinationAddress);
   }
 }

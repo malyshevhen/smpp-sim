@@ -4,17 +4,18 @@ import org.smpp.smscsim.PDUProcessor;
 import org.smpp.smscsim.PDUProcessorFactory;
 import org.smpp.smscsim.SMSCSession;
 
-public class SmppPDUProcessorProxyFactory implements PDUProcessorFactory {
+public class PDUProcessorFactoryProxy implements PDUProcessorFactory {
 
   private final PDUProcessorFactory delegate;
+  private final PDUHandler pduHandler;
 
-  public SmppPDUProcessorProxyFactory(PDUProcessorFactory delegate) {
+  public PDUProcessorFactoryProxy(PDUProcessorFactory delegate, PDUHandler proxyHandler) {
     this.delegate = delegate;
+    this.pduHandler = proxyHandler;
   }
 
   @Override
   public PDUProcessor createPDUProcessor(SMSCSession session) {
-    PDUProcessor processor = delegate.createPDUProcessor(session);
-    return new PDUProcessorProxy(processor.getGroup(), processor);
+    return delegate.createPDUProcessor(new SMSCSessionProxy(session, pduHandler));
   }
 }
