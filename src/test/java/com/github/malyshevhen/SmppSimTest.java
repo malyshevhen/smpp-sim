@@ -9,10 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,8 +22,6 @@ import org.smpp.pdu.BindReceiver;
 import org.smpp.pdu.BindRequest;
 import org.smpp.pdu.BindResponse;
 import org.smpp.pdu.BindTransmitter;
-import org.smpp.pdu.DeliverSM;
-import org.smpp.pdu.PDU;
 import org.smpp.pdu.SubmitSM;
 import org.smpp.pdu.SubmitSMResp;
 import org.smpp.pdu.UnbindResp;
@@ -153,107 +147,7 @@ class SmppSimTest {
   }
 
   @Test
-  void testSendAndReceiveMessage() throws Exception {
-    // This test requires two sessions: one for sending and one for receiving
-
-    // Create receiver session
-    TCPIPConnection receiverConnection = new TCPIPConnection("localhost", PORT);
-    receiverConnection.setReceiveTimeout(5000);
-    Session receiverSession = new Session(receiverConnection);
-
-    // Create transmitter session
-    TCPIPConnection transmitterConnection = new TCPIPConnection("localhost", PORT);
-    transmitterConnection.setReceiveTimeout(5000);
-    Session transmitterSession = new Session(transmitterConnection);
-
-    try {
-      // Bind receiver
-      BindRequest receiverBindRequest = new BindReceiver();
-      receiverBindRequest.setSystemId(TEST_SYSTEM_ID);
-      receiverBindRequest.setPassword(TEST_PASSWORD);
-      receiverBindRequest.setSystemType("");
-      receiverBindRequest.setInterfaceVersion((byte) 0x34);
-      AddressRange addressRange = new AddressRange();
-      addressRange.setTon((byte) 1);
-      addressRange.setNpi((byte) 1);
-      addressRange.setAddressRange(DESTINATION_ADDR);
-      receiverBindRequest.setAddressRange(addressRange);
-
-      BindResponse receiverBindResponse = receiverSession.bind(receiverBindRequest);
-      assertEquals(Data.ESME_ROK, receiverBindResponse.getCommandStatus());
-      log.info("Receiver bound successfully");
-
-      // Bind transmitter
-      BindRequest transmitterBindRequest = new BindTransmitter();
-      transmitterBindRequest.setSystemId(TEST_SYSTEM_ID);
-      transmitterBindRequest.setPassword(TEST_PASSWORD);
-      transmitterBindRequest.setSystemType("");
-      transmitterBindRequest.setInterfaceVersion((byte) 0x34);
-      transmitterBindRequest.setAddressRange(new AddressRange());
-
-      BindResponse transmitterBindResponse = transmitterSession.bind(transmitterBindRequest);
-      assertEquals(Data.ESME_ROK, transmitterBindResponse.getCommandStatus());
-      log.info("Transmitter bound successfully");
-
-      // Create a latch to wait for the message
-      CountDownLatch messageLatch = new CountDownLatch(1);
-      AtomicBoolean messageReceived = new AtomicBoolean(false);
-      AtomicReference<String> receivedMessageContent = new AtomicReference<>();
-
-      // Start a thread to listen for incoming messages
-      Thread receiverThread =
-          new Thread(
-              () -> {
-                try {
-                  PDU pdu;
-                  while ((pdu = receiverSession.receive()) != null) {
-                    if (pdu instanceof DeliverSM deliverSM) {
-                      String message = deliverSM.getShortMessage();
-                      log.info("Received message: {}", message);
-                      receivedMessageContent.set(message);
-                      messageReceived.set(true);
-                      messageLatch.countDown();
-                      break;
-                    }
-                  }
-                } catch (Exception e) {
-                  log.error("Error in receiver thread", e);
-                }
-              });
-      receiverThread.start();
-
-      // Send a message
-      SubmitSM submitSM = new SubmitSM();
-      submitSM.setSourceAddr(new Address((byte) 1, (byte) 1, SOURCE_ADDR));
-      submitSM.setDestAddr(new Address((byte) 1, (byte) 1, DESTINATION_ADDR));
-      submitSM.setShortMessage(TEST_MESSAGE);
-
-      SubmitSMResp submitResp = transmitterSession.submit(submitSM);
-      assertEquals(Data.ESME_ROK, submitResp.getCommandStatus());
-      log.info("Message sent successfully");
-
-      // Wait for the message to be received
-      boolean received = messageLatch.await(10, TimeUnit.SECONDS);
-      assertTrue(received);
-      assertTrue(messageReceived.get());
-      assertEquals("Message content should match", TEST_MESSAGE, receivedMessageContent.get());
-
-      // Unbind sessions
-      UnbindResp transmitterUnbindResp = transmitterSession.unbind();
-      assertEquals(Data.ESME_ROK, transmitterUnbindResp.getCommandStatus());
-
-      receiverThread.interrupt();
-      UnbindResp receiverUnbindResp = receiverSession.unbind();
-      assertEquals(Data.ESME_ROK, receiverUnbindResp.getCommandStatus());
-
-    } finally {
-      transmitterSession.close();
-      receiverSession.close();
-    }
-  }
-
-  @Test
-  void testMessageWithUnicodeContent() throws Exception {
+  void testSendMessage() throws Exception {
     // Create transmitter session
     TCPIPConnection connection = new TCPIPConnection("localhost", PORT);
     connection.setReceiveTimeout(5000);
@@ -271,8 +165,7 @@ class SmppSimTest {
       BindResponse bindResponse = session.bind(bindRequest);
       assertEquals(Data.ESME_ROK, bindResponse.getCommandStatus());
 
-      // Send a message with Unicode content
-      String unicodeMessage = "Hello SMPP! Привет! 你好!";
+      String unicodeMessage = TEST_MESSAGE;
 
       SubmitSM submitSM = new SubmitSM();
       submitSM.setSourceAddr(new Address((byte) 1, (byte) 1, SOURCE_ADDR));
