@@ -35,6 +35,7 @@ public class App {
         log.info("Waiting for SMPP simulator to exit...");
         App.class.wait();
       } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
         log.info("Interrupted. Stopping SMPP simulator...");
       }
     }

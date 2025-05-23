@@ -24,12 +24,4 @@ public class Controller {
   public List<BindRequestInfo> getBindRequests() {
     return pduHandler.getBindResponses().stream().map(BindRequestInfo::from).toList();
   }
-
-  public Object getSubmitSMResponses() {
-    return List.of();
-  }
-
-  public Object getSubmitMultiSMResponses() {
-    return List.of();
-  }
 }

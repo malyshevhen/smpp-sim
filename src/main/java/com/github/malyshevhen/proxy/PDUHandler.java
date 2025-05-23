@@ -7,14 +7,12 @@ import org.smpp.pdu.BindTransmitterResp;
 import org.smpp.pdu.PDU;
 import org.smpp.pdu.SubmitMultiSMResp;
 import org.smpp.pdu.SubmitSMResp;
-import org.smpp.pdu.UnbindResp;
 
 @Slf4j
 public class PDUHandler {
   private final List<BindTransmitterResp> bindTransmitterResponses = new ArrayList<>();
   private final List<SubmitSMResp> submitSMResponses = new ArrayList<>();
   private final List<SubmitMultiSMResp> submitMultiSMResponses = new ArrayList<>();
-  private final List<UnbindResp> unbindResponses = new ArrayList<>();
 
   public synchronized List<BindTransmitterResp> getBindResponses() {
     return new ArrayList<>(bindTransmitterResponses);
@@ -28,10 +26,6 @@ public class PDUHandler {
     return new ArrayList<>(submitMultiSMResponses);
   }
 
-  public synchronized List<UnbindResp> getUnbindResponses() {
-    return new ArrayList<>(unbindResponses);
-  }
-
   public synchronized void handleClientRequest(PDU pdu) {
     logPDU(pdu);
 
@@ -39,7 +33,6 @@ public class PDUHandler {
       case BindTransmitterResp request -> bindTransmitterResponses.add(request);
       case SubmitSMResp response -> submitSMResponses.add(response);
       case SubmitMultiSMResp response -> submitMultiSMResponses.add(response);
-      case UnbindResp response -> unbindResponses.add(response);
       default -> log.warn("Unknown PDU type: {}", pdu.getClass().getSimpleName());
     }
   }

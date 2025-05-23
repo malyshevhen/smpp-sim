@@ -34,11 +34,11 @@ public record BindRequestInfo(
   public static BindRequestInfo from(BindTransmitterResp resp) {
     BindRequest bindRequest = (BindRequest) resp.getOriginalRequest();
 
-    Long id = Long.valueOf(bindRequest.getSequenceNumber());
+    long id = bindRequest.getSequenceNumber();
     String systemId = bindRequest.getSystemId();
     String password = bindRequest.getPassword();
     String cp = bindRequest.getSystemType();
-    String name = bindRequest.getSystemId(); // TODO: use real name
+    String name = bindRequest.getSystemId();
     int ton = bindRequest.getAddressRange().getTon();
     int npi = bindRequest.getAddressRange().getNpi();
 

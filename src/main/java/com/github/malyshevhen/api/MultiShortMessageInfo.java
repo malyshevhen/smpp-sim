@@ -28,7 +28,7 @@ public record MultiShortMessageInfo(
   public static MultiShortMessageInfo from(SubmitMultiSMResp response) {
     SubmitMultiSM request = (SubmitMultiSM) response.getOriginalRequest();
 
-    Long id = Long.valueOf(request.getSequenceNumber());
+    long id = request.getSequenceNumber();
     String message = request.getShortMessage();
     String sourceAddress = request.getSourceAddr().getAddress();
     int count = request.getNumberOfDests();

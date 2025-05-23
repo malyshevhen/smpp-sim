@@ -31,7 +31,7 @@ public record ShortMessageInfo(
   public static ShortMessageInfo from(SubmitSMResp response) {
     SubmitSM request = (SubmitSM) response.getOriginalRequest();
 
-    Long id = Long.valueOf(request.getSequenceNumber());
+    long id = request.getSequenceNumber();
     String message = request.getShortMessage();
     String sourceAddress = request.getSourceAddr().getAddress();
     String destinationAddress = request.getDestAddr().getAddress();

@@ -32,9 +32,6 @@ public class Server {
     app.get("/api/v1/requests/single_sm", ctx -> ctx.json(controller.getSubmitSMs()));
     app.get("/api/v1/requests/multi_sm", ctx -> ctx.json(controller.getSubmitMultiSMs()));
     app.get("/api/v1/requests/bind", ctx -> ctx.json(controller.getBindRequests()));
-
-    app.get("/api/v1/responses/single_sm", ctx -> ctx.json(controller.getSubmitSMResponses()));
-    app.get("/api/v1/responses/multi_sm", ctx -> ctx.json(controller.getSubmitMultiSMResponses()));
   }
 
   public void stop() {
