@@ -1,21 +1,22 @@
 package com.github.malyshevhen;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.smpp.Data;
 import org.smpp.Session;
 import org.smpp.TCPIPConnection;
@@ -33,7 +34,7 @@ import org.smpp.pdu.UnbindResp;
 import org.smpp.util.ByteBuffer;
 
 @Slf4j
-public class SmppSimTest {
+class SmppSimTest {
 
   private static final int PORT = 2776;
   private static final String TEST_SYSTEM_ID = "pavel";
@@ -42,11 +43,11 @@ public class SmppSimTest {
   private static final String DESTINATION_ADDR = "5678";
   private static final String TEST_MESSAGE = "Hello, SMPP world!";
 
-  private SmppSim smppSim;
-  private String tempUsersFile;
+  private static SmppSim smppSim;
+  private static String tempUsersFile;
 
-  @Before
-  public void setUp() throws IOException {
+  @BeforeAll
+  static void setUp() throws IOException {
     // Create a temporary users file with test credentials
     Path tempDir = Files.createTempDirectory("smpp-test");
     tempUsersFile = tempDir.resolve("test-users.txt").toString();
@@ -68,14 +69,14 @@ public class SmppSimTest {
 
     // Give it a moment to initialize
     try {
-      Thread.sleep(500);
+      Thread.sleep(50);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
   }
 
-  @After
-  public void tearDown() throws IOException {
+  @AfterAll
+  static void tearDown() throws IOException {
     // Stop the SMPP simulator
     if (smppSim != null) {
       smppSim.stop();
@@ -86,7 +87,7 @@ public class SmppSimTest {
   }
 
   @Test
-  public void testBindTransmitter() throws Exception {
+  void testBindTransmitter() throws Exception {
     // Create and set connection
     TCPIPConnection connection = new TCPIPConnection("localhost", PORT);
     connection.setReceiveTimeout(5000);
@@ -119,7 +120,7 @@ public class SmppSimTest {
   }
 
   @Test
-  public void testBindReceiver() throws Exception {
+  void testBindReceiver() throws Exception {
     // Create and set connection
     TCPIPConnection connection = new TCPIPConnection("localhost", PORT);
     connection.setReceiveTimeout(5000);
@@ -152,7 +153,7 @@ public class SmppSimTest {
   }
 
   @Test
-  public void testSendAndReceiveMessage() throws Exception {
+  void testSendAndReceiveMessage() throws Exception {
     // This test requires two sessions: one for sending and one for receiving
 
     // Create receiver session
@@ -206,9 +207,8 @@ public class SmppSimTest {
                 try {
                   PDU pdu;
                   while ((pdu = receiverSession.receive()) != null) {
-                    if (pdu instanceof DeliverSM) {
-                      DeliverSM deliverSM = (DeliverSM) pdu;
-                      String message = new String(deliverSM.getShortMessage());
+                    if (pdu instanceof DeliverSM deliverSM) {
+                      String message = deliverSM.getShortMessage();
                       log.info("Received message: {}", message);
                       receivedMessageContent.set(message);
                       messageReceived.set(true);
@@ -228,14 +228,14 @@ public class SmppSimTest {
       submitSM.setDestAddr(new Address((byte) 1, (byte) 1, DESTINATION_ADDR));
       submitSM.setShortMessage(TEST_MESSAGE);
 
-      SubmitSMResp submitResp = (SubmitSMResp) transmitterSession.send(submitSM);
+      SubmitSMResp submitResp = transmitterSession.submit(submitSM);
       assertEquals(Data.ESME_ROK, submitResp.getCommandStatus());
       log.info("Message sent successfully");
 
       // Wait for the message to be received
       boolean received = messageLatch.await(10, TimeUnit.SECONDS);
-      assertTrue("Message should be received", received);
-      assertTrue("Message content should be verified", messageReceived.get());
+      assertTrue(received);
+      assertTrue(messageReceived.get());
       assertEquals("Message content should match", TEST_MESSAGE, receivedMessageContent.get());
 
       // Unbind sessions
@@ -253,7 +253,7 @@ public class SmppSimTest {
   }
 
   @Test
-  public void testMessageWithUnicodeContent() throws Exception {
+  void testMessageWithUnicodeContent() throws Exception {
     // Create transmitter session
     TCPIPConnection connection = new TCPIPConnection("localhost", PORT);
     connection.setReceiveTimeout(5000);
@@ -288,9 +288,9 @@ public class SmppSimTest {
         bb.appendByte((byte) (c >> 8)); // High byte
         bb.appendByte((byte) (c & 0xff)); // Low byte
       }
-      submitSM.setShortMessage(bb.getBuffer().toString());
+      submitSM.setShortMessage(Arrays.toString(bb.getBuffer()));
 
-      SubmitSMResp submitResp = (SubmitSMResp) session.send(submitSM);
+      SubmitSMResp submitResp = session.submit(submitSM);
       assertEquals(Data.ESME_ROK, submitResp.getCommandStatus());
       log.info("Unicode message sent successfully");
 
@@ -303,7 +303,7 @@ public class SmppSimTest {
   }
 
   @Test
-  public void testStopAndRestartSimulator() throws Exception {
+  void testStopAndRestartSimulator() throws Exception {
     // Test that we can stop and restart the simulator
 
     // First stop it
@@ -327,14 +327,14 @@ public class SmppSimTest {
       }
     }
 
-    assertTrue("Connection should fail when simulator is stopped", connectionFailed);
+    assertTrue(connectionFailed);
 
     // Restart the simulator
     smppSim.start();
 
     // Give it a moment to initialize
     try {
-      Thread.sleep(500);
+      Thread.sleep(5);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }

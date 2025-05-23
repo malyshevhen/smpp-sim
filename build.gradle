@@ -16,7 +16,9 @@ dependencies {
     api libs.org.opensmpp.opensmpp.client
     api libs.org.slf4j.slf4j.api
     api libs.org.slf4j.slf4j.simple
-    testImplementation libs.junit.junit
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.0'
 }
 
 group = 'com.github.malyshevhen'
@@ -32,16 +34,24 @@ publishing {
     }
 }
 
-tasks.withType(JavaCompile) {
+testing {
+    suites {
+        test {
+            useJUnitJupiter()
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-tasks.withType(Javadoc) {
+tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
 }
 
 // Run task
-task run(type: JavaExec) {
+tasks.register('run', JavaExec) {
     mainClass = 'com.github.malyshevhen.App'
     classpath = sourceSets.main.runtimeClasspath
 
