@@ -1,6 +1,5 @@
 package com.github.malyshevhen;
 
-import com.github.malyshevhen.api.Controller;
 import com.github.malyshevhen.proxy.PDUHandler;
 import com.github.malyshevhen.proxy.PDUProcessorFactoryProxy;
 import java.io.IOException;

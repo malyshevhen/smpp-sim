@@ -9,6 +9,7 @@ org-projectlombok-lombok = "1.18.38"
 org-slf4j-slf4j-api = "2.0.7"
 org-slf4j-slf4j-simple = "2.0.7"
 io-javalin-javalin = "6.6.0"
+com-google-code-gson = "2.13.1"
 
 [libraries]
 junit-junit = { module = "junit:junit", version.ref = "junit-junit" }
@@ -18,3 +19,4 @@ org-projectlombok-lombok = { module = "org.projectlombok:lombok", version.ref = 
 org-slf4j-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j-slf4j-api" }
 org-slf4j-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "org-slf4j-slf4j-simple" }
 io-javalin-javalin = { module = "io.javalin:javalin", version.ref = "io-javalin-javalin" }
+com-google-code-gson = { module = "com.google.code.gson:gson" , version.ref = "com-google-code-gson" }

@@ -12,21 +12,17 @@ public class Controller {
   }
 
   public List<ShortMessageInfo> getSubmitSMs() {
-    return pduHandler.getSubmitSMs().stream()
-        .map(ShortMessageInfo::from)
-        .toList();
+    return pduHandler.getSubmitSMResponses().stream().map(ShortMessageInfo::from).toList();
   }
 
   public List<MultiShortMessageInfo> getSubmitMultiSMs() {
-    return pduHandler.getSubmitMultiSMs().stream()
+    return pduHandler.getSubmitMultiSMResponses().stream()
         .map(MultiShortMessageInfo::from)
         .toList();
   }
 
   public List<BindRequestInfo> getBindRequests() {
-    return pduHandler.getBindRequests().stream()
-        .map(BindRequestInfo::from)
-        .toList();
+    return pduHandler.getBindResponses().stream().map(BindRequestInfo::from).toList();
   }
 
   public Object getSubmitSMResponses() {

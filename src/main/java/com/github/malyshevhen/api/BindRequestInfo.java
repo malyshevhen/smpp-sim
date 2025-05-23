@@ -1,6 +1,7 @@
 package com.github.malyshevhen.api;
 
 import org.smpp.pdu.BindRequest;
+import org.smpp.pdu.BindTransmitterResp;
 
 /**
  * Represents a bind request. This class is used to store and validate the information of a bind
@@ -12,21 +13,27 @@ public record BindRequestInfo(
     if (id == null || id < 0) {
       throw new IllegalArgumentException("ID must be a positive number");
     }
+
     if (systemId == null || systemId.isEmpty()) {
       throw new IllegalArgumentException("System ID cannot be null or empty");
     }
+
     if (password == null || password.isEmpty()) {
       throw new IllegalArgumentException("Password cannot be null or empty");
     }
+
     if (cp == null || cp.isEmpty()) {
       throw new IllegalArgumentException("CP cannot be null or empty");
     }
+
     if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException("Name cannot be null or empty");
     }
   }
 
-  public static BindRequestInfo from(BindRequest bindRequest) {
+  public static BindRequestInfo from(BindTransmitterResp resp) {
+    BindRequest bindRequest = (BindRequest) resp.getOriginalRequest();
+
     Long id = Long.valueOf(bindRequest.getSequenceNumber());
     String systemId = bindRequest.getSystemId();
     String password = bindRequest.getPassword();

@@ -3,9 +3,10 @@ package com.github.malyshevhen.api;
 import java.util.ArrayList;
 import java.util.List;
 import org.smpp.pdu.SubmitMultiSM;
+import org.smpp.pdu.SubmitMultiSMResp;
 
 public record MultiShortMessageInfo(
-    Long id, String message, String name, String sourceAddress, List<String> destinationAddresses) {
+    Long id, String message, String sourceAddress, List<String> destinationAddresses) {
   public MultiShortMessageInfo {
     if (id == null || id < 0) {
       throw new IllegalArgumentException("ID must be a positive number");
@@ -13,10 +14,6 @@ public record MultiShortMessageInfo(
 
     if (message == null || message.isEmpty()) {
       throw new IllegalArgumentException("Message cannot be null or empty");
-    }
-
-    if (name == null || name.isEmpty()) {
-      throw new IllegalArgumentException("Name cannot be null or empty");
     }
 
     if (sourceAddress == null || sourceAddress.isEmpty()) {
@@ -28,19 +25,20 @@ public record MultiShortMessageInfo(
     }
   }
 
-  public static MultiShortMessageInfo from(SubmitMultiSM submitMultiSM) {
-    Long id = Long.valueOf(submitMultiSM.getSequenceNumber());
-    String message = submitMultiSM.getShortMessage();
-    String name = submitMultiSM.getSourceAddr().debugString(); // TODO: use real name
-    String sourceAddress = submitMultiSM.getSourceAddr().getAddress();
-    int count = submitMultiSM.getNumberOfDests();
+  public static MultiShortMessageInfo from(SubmitMultiSMResp response) {
+    SubmitMultiSM request = (SubmitMultiSM) response.getOriginalRequest();
+
+    Long id = Long.valueOf(request.getSequenceNumber());
+    String message = request.getShortMessage();
+    String sourceAddress = request.getSourceAddr().getAddress();
+    int count = request.getNumberOfDests();
 
     List<String> destinationAddresses = new ArrayList<>();
     for (int i = 0; i < count; i++) {
-      String address = submitMultiSM.getDestAddress(i).getAddress().getAddress();
+      String address = request.getDestAddress(i).getAddress().getAddress();
       destinationAddresses.add(address);
     }
 
-    return new MultiShortMessageInfo(id, message, name, sourceAddress, destinationAddresses);
+    return new MultiShortMessageInfo(id, message, sourceAddress, destinationAddresses);
   }
 }
