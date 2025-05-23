@@ -2,6 +2,8 @@ package com.github.malyshevhen;
 
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import io.javalin.Javalin;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 @Slf4j
 public class App {
@@ -41,5 +43,26 @@ public class App {
     }
 
     log.info("SMPP simulator stopped.");
+  }
+
+  private static void runApiServer() {
+    Javalin app = Javalin.create(config -> {
+        config.useVirtualThreads = true;
+        config.http.asyncTimeout = 10_000L;
+        config.staticFiles.add("/public");
+        config.staticFiles.enableWebjars();
+        config.router.apiBuilder(() -> {
+            path("/api/v1", () -> {
+                path("/messages", () -> {
+                  // GET all submitted messages
+                  // get(Controller::getAllMessages);
+                });
+                path("/requests", () -> {
+                  // GET all binded requests
+                  // get(Controller::getAllRequests);
+                });
+            });
+        });
+    }).start(7070);
   }
 }
