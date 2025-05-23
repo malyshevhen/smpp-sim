@@ -34,7 +34,7 @@ import org.smpp.util.ByteBuffer;
 @Slf4j
 class SmppSimTest {
 
-  private static final String TEST_SYSTEM_ID = "pavel";
+  private static final String TEST_SYSTEM_ID = "boromir";
   private static final String TEST_PASSWORD = "dfsew";
   private static final String SOURCE_ADDR = "1234";
   private static final String DESTINATION_ADDR = "5678";

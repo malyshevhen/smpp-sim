@@ -15,27 +15,27 @@
 # of additional attributes and aren't really used by the simulator :-)
 # (future expansion?)
 # Also note that whitespaces aren't removed from neither attribute name
-# and it's value, i.e. "name=peter" and "name= peter" define two different users,
-# "peter" and " peter".
+# and it's value, i.e. "name=boromir" and "name= boromir" define two different users,
+# "boromir" and " boromir".
 
 
-# Pavel can bound for unlimited time as any type
-name=pavel
+# Boromir can bound for unlimited time as any type
+name=boromir
 password=dfsew
 timeout=unlimited
 
 
-# Jorge has time limited to 10, then the connection is dropped
+# Faramir has time limited to 10, then the connection is dropped
 # if enquire is unsuccessfull
 # Also, Jorge can connect only as triansmitter or receiver, he can't
 # connect as transciever
 
-name=jorge
+name=faramir
 password=prtgljrg
-# And this timeout is in minutes, bad luck, jorge %^)
+# And this timeout is in minutes)
 timout=5
 bound=t,r
 
 # And another users
-name=hugo
+name=legolas
 password=ggoohu
