@@ -16,6 +16,7 @@ COPY --from=build /app/build/libs/*.jar /app/app.jar
 COPY --from=build /app/src/main/resources/ /app/
 
 ENV JAVA_OPTS=""
+ENV API_PORT=8080
 ENV SMPP_SIM_PORT=2775
 ENV SMPP_SIM_USERS_FILE=users.cfg
 
@@ -24,4 +25,4 @@ USER appuser
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD pgrep java || exit 1
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar $SMPP_SIM_PORT $SMPP_SIM_USERS_FILE"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar ${API_PORT} ${SMPP_SIM_PORT} ${SMPP_SIM_USERS_FILE}"]
