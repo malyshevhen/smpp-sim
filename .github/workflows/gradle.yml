@@ -36,21 +36,6 @@ jobs:
     - name: Build with Gradle Wrapper
       run: ./gradlew build
 
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Build Docker image
-      run: |
-        docker build -t ghcr.io/${{ github.repository }}/smpp-sim:latest .
-
-    - name: Push Docker image
-      run: |
-        docker push ghcr.io/${{ github.repository }}/smpp-sim:latest
-
   dependency-submission:
 
     runs-on: ubuntu-latest
