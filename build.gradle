@@ -57,5 +57,5 @@ tasks.register('run', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 
     // pass args to application
-    args '2755', "$projectDir/src/main/resources/users.txt"
+    args '2755', "$projectDir/src/main/resources/users.cfg"
 }

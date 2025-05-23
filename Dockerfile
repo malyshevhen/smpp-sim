@@ -13,11 +13,11 @@ RUN useradd -m appuser
 
 # Copy only the built jar
 COPY --from=build /app/build/libs/*.jar /app/app.jar
-COPY --from=build /app/src/main/resources/ /app/resources/
+COPY --from=build /app/src/main/resources/ /app/
 
 ENV JAVA_OPTS=""
 ENV SMPP_SIM_PORT=2775
-ENV SMPP_SIM_USERS_FILE=users.txt
+ENV SMPP_SIM_USERS_FILE=users.cfg
 
 USER appuser
 
