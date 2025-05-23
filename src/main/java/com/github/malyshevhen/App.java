@@ -12,13 +12,21 @@ public class App {
     log.info("Starting SMPP simulator with port {} and users file {}", port, usersFileName);
     SmppSim smppSim = new SmppSim(port, usersFileName);
 
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      log.info("Shutdown signal received. Stopping SMPP simulator...");
+      try {
+        smppSim.stop();
+      } catch (IOException ioEx) {
+        log.error("Error stopping SMPP simulator during shutdown.", ioEx);
+      }
+      log.info("SMPP simulator stopped (shutdown hook).");
+    }));
+
     try {
       log.info("Starting SMPP simulator...");
-
       smppSim.start();
     } catch (IOException e) {
       log.error("Error starting SMPP simulator.", e);
-
       e.printStackTrace();
     }
 
@@ -29,16 +37,9 @@ public class App {
         App.class.wait();
       } catch (InterruptedException e) {
         log.info("Interrupted. Stopping SMPP simulator...");
-
-        try {
-          smppSim.stop();
-        } catch (IOException ioEx) {
-          log.error("Error stopping SMPP simulator.", ioEx);
-          ioEx.printStackTrace();
-        }
-
-        log.info("SMPP simulator stopped.");
       }
     }
+
+    log.info("SMPP simulator stopped.");
   }
 }
