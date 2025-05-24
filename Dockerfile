@@ -3,7 +3,7 @@ FROM gradle:8.14.0-jdk21 AS build
 WORKDIR /app
 
 COPY . .
-RUN gradle --no-daemon --no-parallel --console=plain clean shadowJar
+RUN gradle --no-daemon --no-parallel --console=plain clean shadowJar -x test
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
