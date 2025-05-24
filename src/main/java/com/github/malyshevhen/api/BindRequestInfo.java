@@ -1,7 +1,6 @@
 package com.github.malyshevhen.api;
 
 import org.smpp.pdu.BindRequest;
-import org.smpp.pdu.BindTransmitterResp;
 
 /**
  * Represents a bind request. This class is used to store and validate the information of a bind
@@ -31,9 +30,7 @@ public record BindRequestInfo(
     }
   }
 
-  public static BindRequestInfo from(BindTransmitterResp resp) {
-    BindRequest bindRequest = (BindRequest) resp.getOriginalRequest();
-
+  public static BindRequestInfo from(BindRequest bindRequest) {
     long id = bindRequest.getSequenceNumber();
     String systemId = bindRequest.getSystemId();
     String password = bindRequest.getPassword();

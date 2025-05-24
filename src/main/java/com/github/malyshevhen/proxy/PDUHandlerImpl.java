@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.extern.slf4j.Slf4j;
+import org.smpp.pdu.BindRequest;
+import org.smpp.pdu.BindTranscieverResp;
 import org.smpp.pdu.BindTransmitterResp;
 import org.smpp.pdu.PDU;
 import org.smpp.pdu.SubmitMultiSMResp;
@@ -11,12 +13,12 @@ import org.smpp.pdu.SubmitSMResp;
 
 @Slf4j
 public class PDUHandlerImpl implements PDUHandler {
-  private final List<BindTransmitterResp> bindTransmitterResponses = new CopyOnWriteArrayList<>();
+  private final List<BindRequest> bindTransmitterResponses = new CopyOnWriteArrayList<>();
   private final List<SubmitSMResp> submitSMResponses = new CopyOnWriteArrayList<>();
   private final List<SubmitMultiSMResp> submitMultiSMResponses = new CopyOnWriteArrayList<>();
 
   @Override
-  public List<BindTransmitterResp> getBindResponses() {
+  public List<BindRequest> getBindResponses() {
     return new ArrayList<>(bindTransmitterResponses);
   }
 
@@ -35,7 +37,11 @@ public class PDUHandlerImpl implements PDUHandler {
     logPDU(pdu);
 
     switch (pdu) {
-      case BindTransmitterResp request -> bindTransmitterResponses.add(request);
+      case BindTransmitterResp request ->
+          bindTransmitterResponses.add((BindRequest) request.getOriginalRequest());
+      case BindTranscieverResp response ->
+          bindTransmitterResponses.add((BindRequest) response.getOriginalRequest());
+      case BindRequest request -> bindTransmitterResponses.add(request);
       case SubmitSMResp response -> submitSMResponses.add(response);
       case SubmitMultiSMResp response -> submitMultiSMResponses.add(response);
       default -> log.warn("Unknown PDU type: {}", pdu.getClass().getSimpleName());
