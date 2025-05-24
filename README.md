@@ -116,13 +116,13 @@ All endpoints return JSON arrays of objects matching the schema in the OpenAPI s
 Fetch all single SubmitSM requests:
 
 ```sh
-curl http://localhost:8080/api/v1/requests/single_sm
+curl http://localhost:8080/api/v1/messages/short-messages
 ```
 
 Fetch all bind requests:
 
 ```sh
-curl http://localhost:8080/api/v1/requests/bind
+curl http://localhost:8080/api/v1/bind-requests
 ```
 
 #### API Server
