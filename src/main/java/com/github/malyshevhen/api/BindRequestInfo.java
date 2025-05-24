@@ -7,7 +7,7 @@ import org.smpp.pdu.BindRequest;
  * request. It includes the ID, system ID, password, CP, name, ton, and npi.
  */
 public record BindRequestInfo(
-    Long id, String systemId, String password, String cp, String name, int ton, int npi) {
+    Long id, String systemId, String password, String name, int ton, int npi) {
   public BindRequestInfo {
     if (id == null || id < 0) {
       throw new IllegalArgumentException("ID must be a positive number");
@@ -21,10 +21,6 @@ public record BindRequestInfo(
       throw new IllegalArgumentException("Password cannot be null or empty");
     }
 
-    if (cp == null || cp.isEmpty()) {
-      throw new IllegalArgumentException("CP cannot be null or empty");
-    }
-
     if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException("Name cannot be null or empty");
     }
@@ -34,11 +30,10 @@ public record BindRequestInfo(
     long id = bindRequest.getSequenceNumber();
     String systemId = bindRequest.getSystemId();
     String password = bindRequest.getPassword();
-    String cp = bindRequest.getSystemType();
     String name = bindRequest.getSystemId();
     int ton = bindRequest.getAddressRange().getTon();
     int npi = bindRequest.getAddressRange().getNpi();
 
-    return new BindRequestInfo(id, systemId, password, cp, name, ton, npi);
+    return new BindRequestInfo(id, systemId, password, name, ton, npi);
   }
 }
