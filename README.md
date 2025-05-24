@@ -53,6 +53,7 @@ Run the container:
 
 ```sh
 docker run -p 2775:2775 \
+  -p 8080:8080 \
   -e API_PORT=8080 \
   -e SMPP_SIM_PORT=2775 \
   -e SMPP_SIM_USERS_FILE=/app/users.cfg \
@@ -87,17 +88,6 @@ bound=t,r
 ./gradlew test
 ```
 
-## Graceful Shutdown
-
-The simulator handles SIGTERM and Ctrl+C gracefully, ensuring all sessions are closed and the port is released.
-
-## Project Structure
-
-- `src/main/java/com/github/malyshevhen/SmppSim.java` - Main simulator logic
-- `src/main/java/com/github/malyshevhen/App.java` - Application entry point
-- `src/main/resources/users.cfg` - Example users file
-- `src/test/java/com/github/malyshevhen/SmppSimTest.java` - Integration tests
-
 ## REST API for SMPP Introspection
 
 The simulator exposes a REST API for inspecting received SMPP requests and messages. This API is useful for integration testing, monitoring, and debugging.
@@ -114,9 +104,10 @@ You can use this file with tools like [Swagger UI](https://swagger.io/tools/swag
 
 ### API Endpoints
 
-- `GET /api/v1/requests/single_sm` — List all single SubmitSM (short message) requests received by the simulator.
-- `GET /api/v1/requests/multi_sm` — List all SubmitMultiSM requests received by the simulator.
-- `GET /api/v1/requests/bind` — List all SMPP bind requests received by the simulator.
+- `GET  /api/v1/messages/short-messages` — List all single SubmitSM (short message) requests received by the simulator.
+- `GET  /api/v1/messages/multi-messages` — List all SubmitMultiSM requests received by the simulator.
+- `GET  /api/v1/bind-requests` — List all SMPP bind requests received by the simulator.
+- `POST /api/v1/clean` - Restore service state.
 
 All endpoints return JSON arrays of objects matching the schema in the OpenAPI spec.
 
