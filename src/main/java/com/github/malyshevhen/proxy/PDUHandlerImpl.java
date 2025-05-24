@@ -33,6 +33,13 @@ public class PDUHandlerImpl implements PDUHandler {
   }
 
   @Override
+  public void clean() {
+    bindTransmitterResponses.clear();
+    submitSMResponses.clear();
+    submitMultiSMResponses.clear();
+  }
+
+  @Override
   public void handleClientRequest(PDU pdu) {
     logPDU(pdu);
 

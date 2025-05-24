@@ -1,8 +1,7 @@
 package com.github.malyshevhen.api;
 
-import java.util.List;
-
 import com.github.malyshevhen.proxy.PDUHandler;
+import java.util.List;
 
 public class Controller {
 
@@ -24,5 +23,9 @@ public class Controller {
 
   public List<BindRequestInfo> getBindRequests() {
     return pduHandler.getBindResponses().stream().map(BindRequestInfo::from).toList();
+  }
+
+  public void clean() {
+    pduHandler.clean();
   }
 }

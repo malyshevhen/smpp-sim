@@ -15,5 +15,7 @@ public interface PDUHandler {
 
   List<SubmitMultiSMResp> getSubmitMultiSMResponses();
 
+  void clean();
+
   void handleClientRequest(PDU pdu);
 }

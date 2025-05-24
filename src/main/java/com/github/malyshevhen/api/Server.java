@@ -2,6 +2,7 @@ package com.github.malyshevhen.api;
 
 import com.github.malyshevhen.proxy.PDUHandler;
 import io.javalin.Javalin;
+import io.javalin.http.Handler;
 
 public class Server {
 
@@ -21,6 +22,7 @@ public class Server {
 
     javalin.before(ctx -> ctx.header("Access-Control-Allow-Origin", "*"));
     javalin.before(ctx -> ctx.header("Access-Control-Allow-Methods", ALLOW_METHODS));
+
     this.app = javalin;
     this.controller = new Controller(pduHandler);
   }
@@ -28,9 +30,29 @@ public class Server {
   public void start(int port) {
     app.start(port);
 
-    app.get("/api/v1/requests/single_sm", ctx -> ctx.json(controller.getSubmitSMs()));
-    app.get("/api/v1/requests/multi_sm", ctx -> ctx.json(controller.getSubmitMultiSMs()));
-    app.get("/api/v1/requests/bind", ctx -> ctx.json(controller.getBindRequests()));
+    app.get("/api/v1/messages/short-messages", handleGetSingleMessages());
+    app.get("/api/v1/messages/multi-messages", handleGetMultiMessages());
+    app.get("/api/v1/bind-requests", handleGetBindRequests());
+    app.post("/api/v1/clean", handleCleanMessages());
+  }
+
+  private Handler handleGetMultiMessages() {
+    return ctx -> ctx.json(controller.getSubmitMultiSMs());
+  }
+
+  private Handler handleGetSingleMessages() {
+    return ctx -> ctx.json(controller.getSubmitSMs());
+  }
+
+  private Handler handleGetBindRequests() {
+    return ctx -> ctx.json(controller.getBindRequests());
+  }
+
+  private Handler handleCleanMessages() {
+    return ctx -> {
+      controller.clean();
+      ctx.status(204);
+    };
   }
 
   public void stop() {
